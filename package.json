@@ -1,0 +1,16 @@
+{
+  "name": "binance-speed-trader",
+  "version": "0.0.1",
+  "description": "way faster/simpler trading",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ali Karami",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^6.0.0",
+    "node-binance-api": "^0.8.3",
+    "underscore": "^1.9.1"
+  }
+}

@@ -75,13 +75,19 @@ function Trade(config) {
 	};
 	this.start = () => {
 		console.log(this.market + ' started.');
-		//logic
-		wallet.updateBalances();
-		ee.addListener(this.market, this.process);
+		wallet.updateBalances().then(() => {
+			this.validate();
+			//logic
+			ee.addListener(this.market, this.process);
+		});
 	};
 	this.process = (price) => {
 		price = Number(price);
-		//logic
+		if (price >= this.targets[0])
+			this.targetReached();
+		else if (price <= this.stopLoss)
+			this.stopLossReached();
+
 		this.updateStopLoss(price);
 		console.log(this.market + ' price: ' + price);
 	};
@@ -102,6 +108,9 @@ function Trade(config) {
 	};
 	this.targetReached = () => {
 		//logic
+		let targetAmount = this.amount * this.targetsShare[0] / 100;
+		this.amount = this.amount - targetAmount;
+		this.order.marketSell(targetAmount);
 		this.targets.shift();
 		if (this.targets.length === 0) {
 			this.allTargetsReached();
@@ -111,9 +120,12 @@ function Trade(config) {
 				this.targetsShare[i] *= (100 / (100 - deletedShare));
 			}
 		}
+		wallet.updateBalances();
 	};
 	this.stopLossReached = () => {
 		//logic
+		this.order.marketSell(this.amount);
+		wallet.updateBalances();
 		this.closeTrade();
 	};
 	this.allTargetsReached = () => {
@@ -129,9 +141,6 @@ function Trade(config) {
 	//******************************************* logic ************************************************
 	if (!this.stopLoss) this.stopLoss = this.entry - (this.entry * this.stopLossPercent / 100);
 	this.validate();
-
-	//addListenerOnMarketPrice()
-
 }
 
 module.exports = Trade;

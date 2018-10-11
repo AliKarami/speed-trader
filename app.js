@@ -1,7 +1,23 @@
 require('dotenv').config();
-const binance = require('./utils/binance');
+require('./utils/priceListener');
+const ee = require('./utils/eventEmiter');
+const Trade = require('./utils/trade');
 
-binance.websockets.trades(['BNBBTC', 'ETHBTC'], (trades) => {
-	let {e:eventType, E:eventTime, s:symbol, p:price, q:quantity, m:maker, a:tradeId} = trades;
-	console.log(symbol+" trade update. price: "+price+", quantity: "+quantity+", maker: "+maker);
+ee.on('BTCUSDT', (price)=>{
+	console.log('BTCUSDT price: ' + price);
 });
+ee.on('ETHBTC', (price)=>{
+	console.log('ETHBTC price: ' + price);
+});
+
+// let trade = new Trade({
+// 	market: 'BTCUSDT',
+// 	entry: 1200,
+// 	targets: [7000, 7100, 7200],
+// 	targetsShare: [30, 50, 20],
+// 	amount: 100,
+// 	// stopLoss: 1150,
+// 	stopLossPercent: 5,
+// 	trailing: true
+// });
+// console.dir(trade);

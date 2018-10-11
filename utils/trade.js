@@ -1,4 +1,5 @@
 const ee = require('./eventEmiter');
+const Order = require('./order');
 
 function Trade(config) {
 	//******************************************* fields ************************************************
@@ -10,7 +11,7 @@ function Trade(config) {
 	this.stopLossPercent = config.stopLossPercent;
 	this.stopLoss = config.stopLoss;
 	this.trailing = config.trailing;
-
+	this.order = new Order(this.market);
 
 	//******************************************* logic ************************************************
 	//verify()
@@ -23,11 +24,15 @@ function Trade(config) {
 		ee.addListener(this.market, this.process);
 	};
 	this.process = (price) => {
+		price = Number(price);
 		console.log(this.market + ' price: ' + price);
 	};
 	this.pause = () => {
 		ee.removeListener(this.market, this.process);
 		console.log(this.market + ' paused.');
+	};
+	this.close = () => {
+		this.closeTrade();
 	};
 	this.updateStopLoss = (currentPrice) => {
 		if (this.trailing && this.stopLossPercent > 0) {
@@ -56,7 +61,8 @@ function Trade(config) {
 		this.closeTrade();
 	};
 	this.closeTrade = () => {
-
+		ee.removeListener(this.market, this.process);
+		console.log(this.market + ' closed.');
 	};
 }
 

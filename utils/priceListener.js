@@ -22,6 +22,8 @@ binance.prevDay(false, (error, prevDay) => {
 		ee.emit(symbol,price);
 		global.ticker[symbol] = price;
 	});
+	ee.emit('price_listener_started');
+	console.log('PriceListener started.')
 
 	// You can use global.ticker anywhere in your program now
 	// setInterval(() => {

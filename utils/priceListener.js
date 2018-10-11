@@ -11,7 +11,7 @@ binance.prevDay(false, (error, prevDay) => {
 		// Filter BTC & USDT markets only (example)
 		if ( !symbol.endsWith('BTC') && !symbol.endsWith('USDT') ) continue;
 
-		console.log(`${symbol} price: ${obj.lastPrice} volume: ${obj.volume} change: ${obj.priceChangePercent}%`);
+		// console.log(`${symbol} price: ${obj.lastPrice} volume: ${obj.volume} change: ${obj.priceChangePercent}%`);
 		global.ticker[symbol] = obj.lastPrice;
 		markets.push(symbol);
 	}

@@ -20,7 +20,7 @@ let updateBalances = async () => {
 
 let getBalance = (coin) => {
 	if (_.isEmpty(global.balances))
-		return updateBalances().then(getBalance(coin));
+		throw new Error('Balances are not updated');
 	if (!global.balances[coin])
 		throw new Error('Coin is wrong');
 	return Number(global.balances[coin].available) + Number(global.balances[coin].onOrder);
@@ -28,7 +28,7 @@ let getBalance = (coin) => {
 
 let getAvailableBalance = (coin) => {
 	if (_.isEmpty(global.balances))
-		return updateBalances().then(getAvailableBalance(coin));
+		throw new Error('Balances are not updated');
 	if (!global.balances[coin])
 		throw new Error('Coin is wrong');
 	return Number(global.balances[coin].available);

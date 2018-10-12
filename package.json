@@ -4,7 +4,7 @@
   "description": "way faster/simpler trading",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "author": "Ali Karami",
   "license": "ISC",
@@ -13,5 +13,9 @@
     "events": "^3.0.0",
     "node-binance-api": "^0.8.3",
     "underscore": "^1.9.1"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0"
   }
 }

@@ -1,5 +1,4 @@
 require('dotenv').config();
-process.env.TEST = true;
 let assert = require('assert');
 const wallet = require('../utils/wallet');
 

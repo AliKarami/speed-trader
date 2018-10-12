@@ -47,5 +47,4 @@ class Wallet {
 
 let instance = new Wallet();
 
-
 module.exports = instance;

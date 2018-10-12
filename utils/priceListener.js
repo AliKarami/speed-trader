@@ -2,31 +2,35 @@ const binance = require('./binance');
 const ee = require('./eventEmiter');
 global.ticker = {};
 
-binance.prevDay(false, (error, prevDay) => {
-	if ( error ) return console.log(error.body);
-	let markets = [];
-	for ( let obj of prevDay ) {
-		let symbol = obj.symbol;
+class PriceListener {
+	constructor() {
+		this.markets = [];
+		binance.prevDay(false, (error, prevDay) => {
+			if ( error ) throw error;
+			for ( let obj of prevDay ) {
+				let symbol = obj.symbol;
 
-		// Filter BTC & USDT markets only (example)
-		if ( !symbol.endsWith('BTC') && !symbol.endsWith('USDT') ) continue;
+				// Filter BTC & USDT markets only (example)
+				if ( !symbol.endsWith('BTC') && !symbol.endsWith('USDT') ) continue;
 
-		// console.log(`${symbol} price: ${obj.lastPrice} volume: ${obj.volume} change: ${obj.priceChangePercent}%`);
-		global.ticker[symbol] = obj.lastPrice;
-		markets.push(symbol);
+				// console.log(`${symbol} price: ${obj.lastPrice} volume: ${obj.volume} change: ${obj.priceChangePercent}%`);
+				global.ticker[symbol] = obj.lastPrice;
+				this.markets.push(symbol);
+			}
+		});
 	}
+	start() {
+		// Subscribe to trades endpoint for all markets
+		binance.websockets.trades(this.markets, (trades) => {
+			let { e: eventType, E: eventTime, s: symbol, p: price, q: quantity, m: maker, a: tradeId } = trades;
+			ee.emit(symbol,price);
+			global.ticker[symbol] = price;
+		});
+		ee.emit('price_listener_started');
+		console.log('PriceListener started.')
+	};
+}
 
-	// Subscribe to trades endpoint for all markets
-	binance.websockets.trades(markets, (trades) => {
-		let { e: eventType, E: eventTime, s: symbol, p: price, q: quantity, m: maker, a: tradeId } = trades;
-		ee.emit(symbol,price);
-		global.ticker[symbol] = price;
-	});
-	ee.emit('price_listener_started');
-	console.log('PriceListener started.')
+const instance = new PriceListener();
 
-	// You can use global.ticker anywhere in your program now
-	// setInterval(() => {
-	// 	console.log("*** Price of BTC: " + global.ticker.BTCUSDT);
-	// }, 3000);
-});
+module.exports = instance;

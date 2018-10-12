@@ -1,5 +1,5 @@
 require('dotenv').config();
-let assert = require('assert');
+const assert = require('assert');
 const wallet = require('../utils/wallet');
 
 describe('Wallet', function() {

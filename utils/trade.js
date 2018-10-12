@@ -4,22 +4,21 @@ const _ = require('underscore');
 const limits = require('../config').limits;
 const wallet = require('./wallet');
 
-function Trade(config) {
-	//******************************************* fields ************************************************
-	this.market = config.market;
-	this.baseCoin = '';
-	this.entry = config.entry;
-	this.targets = config.targets;
-	this.targetsShare = config.targetsShare;
-	this.amount = config.amount;
-	this.stopLossPercent = config.stopLossPercent;
-	this.stopLoss = config.stopLoss;
-	this.trailing = config.trailing;
-	this.order = new Order(this.market);
-
-	//******************************************* methods ************************************************
-	this.validate = () => {
-		//validate values
+class Trade {
+	constructor(config) {
+		this.market = config.market;
+		this.baseCoin = '';
+		this.entry = config.entry;
+		this.targets = config.targets;
+		this.targetsShare = config.targetsShare;
+		this.amount = config.amount;
+		this.stopLossPercent = config.stopLossPercent;
+		this.stopLoss = config.stopLoss;
+		this.trailing = config.trailing;
+		this.order = new Order(this.market);
+		if (!this.stopLoss) this.stopLoss = this.entry - (this.entry * this.stopLossPercent / 100);
+	}
+	async validate() {
 		if (typeof this.market !== 'string')
 			throw new Error('Market is not a String');
 		if (this.market.substr(-3) === 'BTC')
@@ -67,21 +66,18 @@ function Trade(config) {
 			throw new Error('StopLoss is NaN');
 
 		//validate wallet
+		await wallet.updateBalances();
 		let fund = wallet.getAvailableBalance(this.baseCoin);
-		if (Promise.resolve(fund) == fund)
-			throw new Error('Wallet is not synced yet');
-		else if (fund < this.amount)
+		if (fund < this.amount)
 			throw new Error('Not enough funds');
 	};
-	this.start = () => {
+	async start() {
+		await this.validate();
 		console.log(this.market + ' started.');
-		wallet.updateBalances().then(() => {
-			this.validate();
-			//logic
-			ee.addListener(this.market, this.process);
-		});
+		//logic
+		ee.addListener(this.market, this.process);
 	};
-	this.process = (price) => {
+	process(price) {
 		price = Number(price);
 		if (price >= this.targets[0])
 			this.targetReached();
@@ -91,22 +87,22 @@ function Trade(config) {
 		this.updateStopLoss(price);
 		console.log(this.market + ' price: ' + price);
 	};
-	this.pause = () => {
+	pause() {
 		ee.removeListener(this.market, this.process);
 		//logic
 		console.log(this.market + ' paused.');
 	};
-	this.close = () => {
+	close() {
 		//logic
 		this.closeTrade();
 	};
-	this.updateStopLoss = (currentPrice) => {
+	updateStopLoss(currentPrice) {
 		if (this.trailing && this.stopLossPercent > 0) {
 			let newStopLoss = currentPrice - (currentPrice * this.stopLossPercent / 100);
 			if (newStopLoss > this.stopLoss) this.stopLoss = newStopLoss;
 		}
 	};
-	this.targetReached = () => {
+	targetReached() {
 		//logic
 		let targetAmount = this.amount * this.targetsShare[0] / 100;
 		this.amount = this.amount - targetAmount;
@@ -122,25 +118,20 @@ function Trade(config) {
 		}
 		wallet.updateBalances();
 	};
-	this.stopLossReached = () => {
+	stopLossReached() {
 		//logic
 		this.order.marketSell(this.amount);
 		wallet.updateBalances();
 		this.closeTrade();
 	};
-	this.allTargetsReached = () => {
+	allTargetsReached() {
 		//logic
 		this.closeTrade();
 	};
-	this.closeTrade = () => {
+	closeTrade() {
 		ee.removeListener(this.market, this.process);
 		console.log(this.market + ' closed.');
 	};
-
-
-	//******************************************* logic ************************************************
-	if (!this.stopLoss) this.stopLoss = this.entry - (this.entry * this.stopLossPercent / 100);
-	this.validate();
 }
 
 module.exports = Trade;

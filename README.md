@@ -1,8 +1,8 @@
-#Binance Speed Trader
+# Binance Speed Trader
 
 _Caution: WIP_
 
-##What it is?
+## What it is?
 This application lets you place trades simply using:
 `entry`, `targets`, `targetsShare`, `stopLoss`, `trailing`
 

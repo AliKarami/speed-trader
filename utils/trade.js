@@ -6,6 +6,7 @@ const wallet = require('./wallet');
 
 class Trade {
 	constructor(config) {
+		this.validate(config);
 		this.market = config.market;
 		this.baseCoin = '';
 		this.entry = config.entry;
@@ -16,63 +17,69 @@ class Trade {
 		this.stopLoss = config.stopLoss;
 		this.trailing = config.trailing;
 		this.order = new Order(this.market);
-		if (!this.stopLoss) this.stopLoss = this.entry - (this.entry * this.stopLossPercent / 100);
-	}
-	async validate() {
-		if (typeof this.market !== 'string')
-			throw new Error('Market is not a String');
 		if (this.market.substr(-3) === 'BTC')
 			this.baseCoin='BTC';
 		else if (this.market.substr(-4) === 'USDT')
 			this.baseCoin='USDT';
-		else
-			throw new Error('Base coin should be BTC or USDT');
-		if (!global.ticker[this.market])
-			throw new Error('Market is not in valid markets');
-		if (typeof this.entry !== 'number')
-			throw new Error('Entry is NaN');
-		if (this.entry > global.ticker[this.market])
-			throw new Error('Entry is more than current price');
-		if (this.targets.constructor !== Array)
-			throw new Error('Targets are not an array');
-		if (this.targets.length < 1)
-			throw new Error('Targets are empty');
+		if (!this.stopLoss)
+			this.stopLoss = this.entry - (this.entry * this.stopLossPercent / 100);
+		else if (!!this.stopLossPercent && this.stopLoss < (this.entry * (100 - this.stopLossPercent) / 100))
+			this.stopLoss = (this.entry * (100 - this.stopLossPercent) / 100);
 		if (this.targets.length === 1)
 			this.targetsShare = [100];
-		if (this.targetsShare.constructor !== Array)
-			throw new Error('Target shares is not an array');
-		if (this.targetsShare.length !== this.targets.length)
-			throw new Error('Wrong target shares');
-		let targetsShareSum = _.reduce(this.targetsShare, function(memo, num){
-			if (num < 0 || num > 100)
-				throw new Error('Some shares are invalid');
-			return memo + num;
-			}, 0);
-		if (targetsShareSum < 99.999)
-			throw new Error('Target shares are less than 100%');
-		if (targetsShareSum > 100)
-			throw new Error('Target shares are more than 100%');
-		if (typeof this.amount !== 'number')
-			throw new Error('Amount is NaN');
 		if (!this.trailing)
 			this.trailing = false;
-		if (!!this.stopLossPercent && typeof this.stopLossPercent !== 'number')
-			throw new Error('StopLossPercent is NaN');
-		if (this.trailing && !this.stopLossPercent)
-			throw new Error('Cannot have trailing without stopLossPercent');
-		if (!!this.stopLossPercent && ((this.stopLossPercent > limits.MAX_STOP_LOSS_PERCENT) || (this.stopLossPercent < 0)))
-			throw new Error('StopLossPercent is less than 0 or more than ' + limits.MAX_STOP_LOSS_PERCENT);
-		if (!!this.stopLoss && typeof this.stopLoss !== 'number')
-			throw new Error('StopLoss is NaN');
+	}
 
-		//validate wallet
+	validate(config) {
+		if (typeof config.market !== 'string')
+			throw new Error('Market is not a String');
+		if (config.market.substr(-3) !== 'BTC' && config.market.substr(-4) !== 'USDT')
+			throw new Error('Base coin should be BTC or USDT');
+		if (!global.ticker[config.market])
+			throw new Error('Market is not in valid markets');
+		if (typeof config.entry !== 'number')
+			throw new Error('Entry is NaN');
+		if (config.entry > global.ticker[config.market])
+			throw new Error('Entry is more than current price');
+		if (config.targets.constructor !== Array)
+			throw new Error('Targets are not an array');
+		if (config.targets.length < 1)
+			throw new Error('Targets are empty');
+		if (!!config.targetsShare && config.targetsShare.constructor !== Array)
+			throw new Error('Target shares is not an array');
+		if (!!config.targetsShare && config.targetsShare.length !== config.targets.length)
+			throw new Error('Wrong target shares');
+		if (config.targets.length > 1) {
+			let targetsShareSum = _.reduce(config.targetsShare, function(memo, num){
+				if (num < 0 || num > 100)
+					throw new Error('Some shares are invalid');
+				return memo + num;
+			}, 0);
+			if (targetsShareSum < 99.999)
+				throw new Error('Target shares are less than 100%');
+			if (targetsShareSum > 100)
+				throw new Error('Target shares are more than 100%');
+		}
+		if (typeof config.amount !== 'number')
+			throw new Error('Amount is NaN');
+		if (!!config.stopLossPercent && typeof config.stopLossPercent !== 'number')
+			throw new Error('StopLossPercent is NaN');
+		if (config.trailing && !config.stopLossPercent)
+			throw new Error('Cannot have trailing without stopLossPercent');
+		if (!!config.stopLossPercent && ((config.stopLossPercent > limits.MAX_STOP_LOSS_PERCENT) || (config.stopLossPercent < 0)))
+			throw new Error('StopLossPercent is less than 0 or more than ' + limits.MAX_STOP_LOSS_PERCENT);
+		if (!!config.stopLoss && typeof config.stopLoss !== 'number')
+			throw new Error('StopLoss is NaN');
+	}
+	async validateWallet() {
 		await wallet.updateBalances();
 		let fund = wallet.getAvailableBalance(this.baseCoin);
 		if (fund < this.amount)
 			throw new Error('Not enough funds');
 	};
 	async start() {
-		await this.validate();
+		await this.validateWallet();
 		console.log(this.market + ' started.');
 		//logic
 		ee.addListener(this.market, this.process);

@@ -6,7 +6,6 @@ global.ticker = {};
 class PriceListener {
 	constructor() {
 		this.markets = [];
-		this.init();
 	}
 	async init() {
 		return new Promise((resolve, reject) => {

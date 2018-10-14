@@ -4,7 +4,8 @@
   "description": "way faster/simpler trading",
   "main": "app.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "start": "node app.js"
   },
   "author": "Ali Karami",
   "license": "ISC",

@@ -1,4 +1,5 @@
 module.exports = {
+	exchange: process.env.EXCHANGE.toLowerCase(),
 	binance: {
 		APIKEY: process.env.API_KEY,
 		APISECRET: process.env.API_SECRET,

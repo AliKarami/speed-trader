@@ -1,8 +1,8 @@
-# Binance Speed Trader
+# Speed Trader
 
 _Caution: Do Not Use This App till a Stable Release, WORK IN PROGRESS!_
 
-![BinanceSpeedTrader](https://cdn3.iconfinder.com/data/icons/stock-market/512/bull_stock_trader-512.png)
+![SpeedTrader](https://cdn3.iconfinder.com/data/icons/stock-market/512/bull_stock_trader-512.png)
 ## What it is?
 This application lets you place trades simply using:
 `entry`, `targets`, `targetsShare`, `stopLoss`, `trailing`
@@ -48,8 +48,8 @@ npm install --only=production
 create a file named `.env` in the root directory of project and fill it this way:
 
 ```dotenv
-API_KEY={YOUR_BINANCE_API_KEY}
-API_SECRET={YOUR_BINANCE_API_SECRET}
+API_KEY={YOUR_API_KEY}
+API_SECRET={YOUR_API_SECRET}
 TEST=true
 ```
 
@@ -58,5 +58,10 @@ open `app.js` in your text editor, create a trade and play with it, then start t
 ```bash
 npm start
 ```
+
+## Supported Exchanges
+
+- Binance
+
 ## Examples
 TODO

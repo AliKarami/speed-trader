@@ -1,5 +1,5 @@
 require('dotenv').config();
-const priceListener = require('./priceListener');
+const priceListener = require('../exchanges/PriceListener');
 const wallet = require('./wallet');
 const _ = require('underscore');
 const ee = require('./eventEmiter');

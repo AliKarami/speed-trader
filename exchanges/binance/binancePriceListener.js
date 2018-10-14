@@ -1,9 +1,9 @@
 const binance = require('./binance');
-const ee = require('./eventEmiter');
+const ee = require('../../utils/eventEmiter');
 const _ = require('underscore');
 global.ticker = {};
 
-class PriceListener {
+class BinancePriceListener {
 	constructor() {
 		this.markets = [];
 	}
@@ -34,7 +34,7 @@ class PriceListener {
 			global.ticker[symbol] = Number(price);
 		});
 		ee.emit('price_listener_started');
-		console.log('PriceListener started.')
+		console.log('BinancePriceListener started.')
 	};
 	stop() {
 		// List all endpoints
@@ -43,9 +43,9 @@ class PriceListener {
 			binance.websockets.terminate(endpoint);
 		}
 		ee.emit('price_listener_stopped');
-		console.log('PriceListener stopped.')
+		console.log('BinancePriceListener stopped.')
 	}
 }
-const instance = new PriceListener();
+const instance = new BinancePriceListener();
 
 module.exports = instance;

@@ -1,23 +1,23 @@
-const binance = require('./binance');
+const exchange = require('../exchanges/exchange');
 
 class Order {
 	constructor(market) {
 		this.market = market;
 	};
 	marketSell (quantity) {
-		binance.marketSell(this.market, quantity);
+		exchange.marketSell(this.market, quantity);
 	};
 
 	marketBuy(quantity) {
-		binance.marketBuy(this.market, quantity);
+		exchange.marketBuy(this.market, quantity);
 	};
 
 	limitSell(quantity, price) {
-		binance.sell(this.market, quantity, price);
+		exchange.sell(this.market, quantity, price);
 	};
 
 	limitBuy(quantity, price) {
-		binance.buy(this.market, quantity, price);
+		exchange.buy(this.market, quantity, price);
 	};
 }
 

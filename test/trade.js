@@ -2,7 +2,7 @@ require('dotenv').config();
 const assert = require('assert');
 const Trade = require('../utils/trade');
 const wallet = require('../utils/wallet');
-const priceListener = require('../utils/priceListener');
+const priceListener = require('../exchanges/priceListener');
 const ee = require('../utils/eventEmiter');
 
 describe('Trade', function() {

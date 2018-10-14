@@ -1,4 +1,4 @@
-const binance = require('./binance');
+const exchange = require('../exchanges/exchange');
 const ee = require('./eventEmiter');
 const _ = require('underscore');
 
@@ -13,7 +13,7 @@ class Wallet {
 	//******************************************* methods ************************************************
 	async updateBalances() {
 		return new Promise((resolve, reject) => {
-			binance.balance(function(error, balances) {
+			exchange.balance(function(error, balances) {
 				if (error)
 					reject(error);
 				else {

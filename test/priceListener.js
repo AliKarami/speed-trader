@@ -7,11 +7,11 @@ describe('PriceListener', function() {
 	before(function() {
 		global.ticker = {};
 		global.balances = {};
-		priceListener = require('../utils/priceListener');
+		priceListener = require('../exchanges/priceListener');
 		priceListener.markets = [];
 	});
 	it('constructor', function (done) {
-		this.timeout(5000);
+		this.timeout(10000);
 		priceListener.init().then(() => {
 			assert(priceListener.markets.length > 0);
 			assert.equal(typeof global.ticker['BTCUSDT'], 'number');
@@ -20,12 +20,14 @@ describe('PriceListener', function() {
 		});
 	});
 	it('start()', function (done) {
-		this.timeout(5000);
+		let started = false;
+		this.timeout(10000);
 		priceListener.start();
 		ee.on('BTCUSDT', (price) => {
 			assert.equal(typeof price, 'number');
 			assert(price > 0);
-			done();
+			if (!started) done();
+			started = true;
 		});
 	});
 	it('stop()', function (done) {

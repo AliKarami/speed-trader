@@ -13,7 +13,7 @@ so you should not worry about placing stop-loss and sell limits simultaneously o
 You can clone this repo into your computer
 
 ```bash
-git clone https://github.com/AliKarami/binance-speed-trader.git
+git clone https://github.com/AliKarami/speed-trader.git
 ```
 
 if you do not have nodejs/npm on your system, you have to install them:
